@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS counterparty (id INT PRIMARY KEY, name VARCHAR(120), short_code VARCHAR(30) UNIQUE, credit_limit DECIMAL(18,2), active BOOLEAN, country VARCHAR(50));
+CREATE TABLE IF NOT EXISTS instrument (id INT PRIMARY KEY, code VARCHAR(30) UNIQUE, name VARCHAR(120), commodity_type VARCHAR(30), unit VARCHAR(10), currency VARCHAR(3), delivery_location VARCHAR(80));
+CREATE TABLE IF NOT EXISTS deal (id INT AUTO_INCREMENT PRIMARY KEY, deal_ref VARCHAR(30) UNIQUE, trade_date DATE, value_date DATE, delivery_start DATE, delivery_end DATE, trade_type VARCHAR(15), side VARCHAR(8), quantity DECIMAL(18,4), price DECIMAL(18,4), instrument_id INT, counterparty_id INT, book VARCHAR(30), trader VARCHAR(60), status VARCHAR(20), financial BOOLEAN, FOREIGN KEY (instrument_id) REFERENCES instrument(id), FOREIGN KEY (counterparty_id) REFERENCES counterparty(id));
+CREATE TABLE IF NOT EXISTS market_price (instrument_id INT, price_date DATE, price DECIMAL(18,4), PRIMARY KEY (instrument_id, price_date));
+CREATE TABLE IF NOT EXISTS instrument_vol (instrument_id INT PRIMARY KEY, annualized_vol DECIMAL(10,6));
+CREATE TABLE IF NOT EXISTS settlement_config (config_key VARCHAR(50) PRIMARY KEY, config_value DECIMAL(18,6));
+CREATE TABLE IF NOT EXISTS invoice (id INT AUTO_INCREMENT PRIMARY KEY, deal_id INT, invoice_date DATE, amount DECIMAL(18,4), accrued_interest DECIMAL(18,4), details VARCHAR(2000));
+CREATE TABLE IF NOT EXISTS fax_queue (id INT AUTO_INCREMENT PRIMARY KEY, deal_id INT, created_at TIMESTAMP, status VARCHAR(20));
+CREATE TABLE IF NOT EXISTS eod_position (snapshot_id VARCHAR(50), business_date DATE, book VARCHAR(30), instrument_id INT, net_qty DECIMAL(18,4), mtm DECIMAL(18,4));
+CREATE TABLE IF NOT EXISTS eod_run_log (id INT AUTO_INCREMENT PRIMARY KEY, business_date DATE, started_at TIMESTAMP, finished_at TIMESTAMP, status VARCHAR(20));
+CREATE TABLE IF NOT EXISTS deal_audit (id INT AUTO_INCREMENT PRIMARY KEY, deal_id INT, deal_ref VARCHAR(30), action VARCHAR(40), changed_at TIMESTAMP, details VARCHAR(2000));
