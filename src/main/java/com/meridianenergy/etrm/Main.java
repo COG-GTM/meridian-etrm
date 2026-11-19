@@ -2,6 +2,7 @@ package com.meridianenergy.etrm;
 
 import com.meridianenergy.etrm.batch.EodBatchJob;
 import com.meridianenergy.etrm.core.AppContext;
+import com.meridianenergy.etrm.core.DbConnectionManager;
 import com.meridianenergy.etrm.core.SchemaBootstrap;
 import com.meridianenergy.etrm.deal.Deal;
 import com.meridianenergy.etrm.web.RestServer;
@@ -17,7 +18,17 @@ public class Main {
             RestServer server = new RestServer();
             server.start(port);
             Thread.currentThread().join();
-        } else if ("eod".equals(command)) {
+        } else {
+            try {
+                runCommand(command, args);
+            } finally {
+                DbConnectionManager.closeAll();
+            }
+        }
+    }
+
+    private static void runCommand(String command, String[] args) {
+        if ("eod".equals(command)) {
             System.out.println(new EodBatchJob().run());
         } else if ("risk-report".equals(command)) {
             System.out.println(AppContext.getRiskReportService().textReport());
